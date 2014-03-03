@@ -1,8 +1,11 @@
 package femtocraft.transport.items.tiles;
 
-import femtocraft.Femtocraft;
-import femtocraft.FemtocraftUtils;
-import femtocraft.api.IVacuumTube;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -14,22 +17,25 @@ import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.ForgeDirection;
-
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import femtocraft.Femtocraft;
+import femtocraft.FemtocraftDataUtils.Saveable;
+import femtocraft.FemtocraftUtils;
+import femtocraft.api.IVacuumTube;
 
 public class TileEntityVacuumTube extends TileEntity implements IVacuumTube {
+	// NOT A FEMTOCRAFTTILEENTITY AT THIS POINT IN TIME, @SAVEABLE DOESN"T WORK.
+	// DURP
+
 	// hasItem array for client-side rendering only
 	// Server will update this array and this alone to save bytes
 	// Player has no need to know WHAT is in the pipes, anyways
 	static final public String packetChannel = Femtocraft.ID + ".VTube";
 
+	// Will not be @Saveable due to bit masking
 	public boolean[] hasItem = new boolean[4];
 
-	private ItemStack[] items = new ItemStack[4];
+	private @Saveable
+	ItemStack[] items = new ItemStack[4];
 
 	ForgeDirection inputDir = ForgeDirection.UNKNOWN;
 	ForgeDirection outputDir = ForgeDirection.UNKNOWN;
@@ -41,9 +47,10 @@ public class TileEntityVacuumTube extends TileEntity implements IVacuumTube {
 	private IVacuumTube inputTube = null;
 	private IVacuumTube outputTube = null;
 
-	public ItemStack queuedItem = null;
+	public @Saveable
+	ItemStack queuedItem = null;
 
-    private boolean overflowing = false;
+	private boolean overflowing = false;
 	private boolean canFillInv = true;
 
 	private boolean needsCheckInput = false;
@@ -284,7 +291,7 @@ public class TileEntityVacuumTube extends TileEntity implements IVacuumTube {
 
 		if (tile instanceof IVacuumTube) {
 
-            inputTube = (IVacuumTube) tile;
+			inputTube = (IVacuumTube) tile;
 			inputDir = dir;
 			inputSidedInv = null;
 			inputInv = null;
@@ -339,7 +346,7 @@ public class TileEntityVacuumTube extends TileEntity implements IVacuumTube {
 
 		if (tile instanceof IVacuumTube) {
 
-            outputTube = (IVacuumTube) tile;
+			outputTube = (IVacuumTube) tile;
 			outputDir = dir;
 			outputSidedInv = null;
 			outputInv = null;
@@ -365,9 +372,10 @@ public class TileEntityVacuumTube extends TileEntity implements IVacuumTube {
 	private void cycleSearch() {
 		int i = 0;
 
-        int lastOutputOrientation = FemtocraftUtils
-                .indexOfForgeDirection(outputDir);
-        int lastInputOrientation = FemtocraftUtils.indexOfForgeDirection(inputDir);
+		int lastOutputOrientation = FemtocraftUtils
+				.indexOfForgeDirection(outputDir);
+		int lastInputOrientation = FemtocraftUtils
+				.indexOfForgeDirection(inputDir);
 
 		do {
 			lastOutputOrientation += 1;
@@ -408,7 +416,8 @@ public class TileEntityVacuumTube extends TileEntity implements IVacuumTube {
 		worldObj.markBlockForRenderUpdate(xCoord, yCoord, zCoord);
 	}
 
-	private void setupReceiveFromTube(TileEntityVacuumTube tube, ForgeDirection dir) {
+	private void setupReceiveFromTube(TileEntityVacuumTube tube,
+			ForgeDirection dir) {
 		tube.outputTube = this;
 		tube.outputInv = null;
 		tube.outputSidedInv = null;
@@ -487,7 +496,7 @@ public class TileEntityVacuumTube extends TileEntity implements IVacuumTube {
 		if (!missingInput())
 			return;
 
-        queuedItem = ItemStack.copyItemStack(item.getEntityItem());
+		queuedItem = ItemStack.copyItemStack(item.getEntityItem());
 		worldObj.removeEntity(item);
 		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 		worldObj.markBlockForRenderUpdate(xCoord, yCoord, zCoord);
@@ -738,20 +747,20 @@ public class TileEntityVacuumTube extends TileEntity implements IVacuumTube {
 			int side = FemtocraftUtils.indexOfForgeDirection(inputDir
 					.getOpposite());
 			int[] slots = inputSidedInv.getAccessibleSlotsFromSide(side);
-            for (int slot : slots) {
-                ItemStack stack = inputSidedInv.getStackInSlot(slot);
-                if (stack != null) {
-                    if (!inputSidedInv.canExtractItem(slot, stack, side))
-                        continue;
+			for (int slot : slots) {
+				ItemStack stack = inputSidedInv.getStackInSlot(slot);
+				if (stack != null) {
+					if (!inputSidedInv.canExtractItem(slot, stack, side))
+						continue;
 
-                    items[0] = inputSidedInv.decrStackSize(slot, 64);
-                    hasItem[0] = true;
-                    inputSidedInv.onInventoryChanged();
-                    worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-                    worldObj.markBlockForRenderUpdate(xCoord, yCoord, zCoord);
-                    return;
-                }
-            }
+					items[0] = inputSidedInv.decrStackSize(slot, 64);
+					hasItem[0] = true;
+					inputSidedInv.onInventoryChanged();
+					worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+					worldObj.markBlockForRenderUpdate(xCoord, yCoord, zCoord);
+					return;
+				}
+			}
 
 		} else if (inputInv != null) {
 			int size = inputInv.getSizeInventory();

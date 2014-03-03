@@ -7,13 +7,11 @@ import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.oredict.OreDictionary;
-import net.minecraftforge.oredict.ShapedOreRecipe;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -109,6 +107,8 @@ import femtocraft.power.items.ItemSpoolGold;
 import femtocraft.proxy.ProxyClient;
 import femtocraft.proxy.ProxyCommon;
 import femtocraft.research.blocks.BlockResearchComputer;
+import femtocraft.research.blocks.BlockResearchConsole;
+import femtocraft.research.items.ItemFemtoTechnology;
 import femtocraft.research.items.ItemMicroTechnology;
 import femtocraft.research.items.ItemNanoTechnology;
 import femtocraft.transport.items.blocks.BlockVacuumTube;
@@ -147,6 +147,7 @@ public class Femtocraft {
 	public static Block femtoStone;
 	public static Block unidentifiedAlloy;
 	public static Block researchComputer;
+	public static Block researchConsole;
 	public static Block generatorTest;
 	public static Block consumerTest;
 	public static Block microFurnaceUnlit;
@@ -197,6 +198,7 @@ public class Femtocraft {
 
 	public static Item itemMicroTechnology;
 	public static Item itemNanoTechnology;
+	public static Item itemFemtoTechnology;
 
 	public static Item paperSchematic;
 
@@ -339,6 +341,11 @@ public class Femtocraft {
 				FemtocraftConfigs.FemtocraftResearchComputerID);
 		GameRegistry.registerBlock(researchComputer, "researchComputer");
 		LanguageRegistry.addName(researchComputer, "Research Computer");
+
+		researchConsole = new BlockResearchConsole(
+				FemtocraftConfigs.FemtocraftResearchConsoleID);
+		GameRegistry.registerBlock(researchConsole, "researchConsole");
+		LanguageRegistry.addName(researchConsole, "Research Console");
 
 		blockMicroCable = new BlockMicroCable(FemtocraftConfigs.microCableID,
 				Material.rock);
@@ -562,6 +569,10 @@ public class Femtocraft {
 		itemNanoTechnology = new ItemNanoTechnology(
 				FemtocraftConfigs.itemNanoTechnologyID);
 		LanguageRegistry.addName(itemNanoTechnology, "Nano Technology");
+
+		itemFemtoTechnology = new ItemFemtoTechnology(
+				FemtocraftConfigs.itemFemtoTechnologyID);
+		LanguageRegistry.addName(itemFemtoTechnology, "Femto Technology");
 
 		// Schematics
 		paperSchematic = new ItemPaperSchematic(
